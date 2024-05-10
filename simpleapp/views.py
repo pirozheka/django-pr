@@ -1,11 +1,16 @@
 from django.shortcuts import render
+from django.shortcuts import redirect
 
 # Create your views here.
 from datetime import datetime
+from django.urls import reverse_lazy
 # Импортируем класс, который говорит нам о том,
 # что в этом представлении мы будем выводить список объектов из БД
-from django.views.generic import ListView, DetailView
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView
+)
 from .models import Product
+from .forms import ProductForm
 from .filters import ProductFilter
 
 
@@ -55,3 +60,27 @@ class ProductDetail(DetailView):
     template_name = 'product.html'
     # Название объекта, в котором будет выбранный пользователем продукт
     context_object_name = 'product'
+
+    # Добавляем новое представление для создания товаров.
+class ProductCreate(CreateView):
+    # Указываем нашу разработанную форму
+    form_class = ProductForm
+    # модель товаров
+    model = Product
+    # и новый шаблон, в котором используется форма.
+    template_name = 'product_edit.html'
+
+     # После успешного создания товара, перенаправляем пользователя на страницу детального описания товара.
+    def get_success_url(self):
+        return reverse_lazy('product_detail', kwargs={'pk': self.object.pk})
+    
+class ProductUpdate(UpdateView):
+    form_class = ProductForm
+    model = Product
+    template_name = 'product_edit.html'
+
+# Представление удаляющее товар.
+class ProductDelete(DeleteView):
+    model = Product
+    template_name = 'product_delete.html'
+    success_url = reverse_lazy('product_list')
