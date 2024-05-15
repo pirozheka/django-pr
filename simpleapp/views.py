@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.shortcuts import redirect
 
@@ -62,7 +63,9 @@ class ProductDetail(DetailView):
     context_object_name = 'product'
 
     # Добавляем новое представление для создания товаров.
-class ProductCreate(CreateView):
+class ProductCreate(LoginRequiredMixin, CreateView):
+    #теперь вместь 404 будет отображаться 403 - сделали для нее шаблон, пути к нему прописывать не нужно
+    raise_exception = True
     # Указываем нашу разработанную форму
     form_class = ProductForm
     # модель товаров
